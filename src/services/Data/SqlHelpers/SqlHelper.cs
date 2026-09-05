@@ -60,9 +60,10 @@ public static class SqlHelper
     /// <param name="method">The method name.</param>
     /// <param name="command">The command.</param>
     /// <param name="logger">The logger.</param>
-    private static void LogCommand(string method, IDbCommand command, ILogger logger)
+    public static void LogCommand(string method, IDbCommand command, ILogger logger)
     {
         ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(command);
 
         if (logger.IsEnabled(LogLevel.Debug) == true)
         try
