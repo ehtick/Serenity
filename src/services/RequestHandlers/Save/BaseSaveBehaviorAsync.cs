@@ -3,7 +3,7 @@ namespace Serenity.Services;
 /// <summary>
 /// Base class for behaviors implementing <see cref="ISaveBehaviorAsync"/>
 /// </summary>
-public abstract class BaseSaveBehaviorAsync : ISaveBehaviorAsync
+public abstract class BaseSaveBehaviorAsync : ISaveBehaviorAsync, ISaveExceptionBehavior
 {
     /// <inheritdoc/>
     public virtual Task OnPrepareQueryAsync(ISaveRequestHandler handler, SqlQuery query,
@@ -52,5 +52,10 @@ public abstract class BaseSaveBehaviorAsync : ISaveBehaviorAsync
         CancellationToken cancellationToken = default)
     {
         return Task.CompletedTask;
+    }
+
+    /// <inheritdoc/>
+    public virtual void OnException(ISaveRequestHandler handler, Exception exception)
+    {
     }
 }

@@ -10,7 +10,12 @@ namespace Serenity.Services;
 /// <typeparam name="TRow">Entity type</typeparam>
 /// <typeparam name="TListRequest">List request type</typeparam>
 /// <typeparam name="TListResponse">List response type</typeparam>
-public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse> : IListRequestHandler
+/// <remarks>
+/// Initializes a new instance of the class.
+/// </remarks>
+/// <param name="context">Request context</param>
+/// <exception cref="ArgumentNullException"><paramref name="context"/> is <c>null</c>.</exception>
+public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(IRequestContext context) : IListRequestHandler
     where TRow : class, IRow, new()
     where TListRequest : ListRequest
     where TListResponse : ListResponse<TRow>, new()
@@ -25,17 +30,6 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse> 
     /// allows access to lookup fields.
     /// </summary>
     protected bool lookupAccessMode;
-
-    /// <summary>
-    /// Initializes a new instance of the class.
-    /// </summary>
-    /// <param name="context">Request context</param>
-    /// <exception cref="ArgumentNullException"><paramref name="context"/> is <c>null</c>.</exception>
-    protected ListRequestHandlerBase(IRequestContext context)
-    {
-        Context = context ?? throw new ArgumentNullException(nameof(context));
-        StateBag = new Dictionary<string, object>();
-    }
 
     /// <summary>
     /// Gets the list of list behaviors.
@@ -276,7 +270,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse> 
             ((field.MinSelectLevel == SelectLevel.Never) &&
                 (!field.CustomAttributes.OfType<QuickSearchAttribute>().Any())))
         {
-            throw new ArgumentOutOfRangeException("containsField");
+            throw new ArgumentOutOfRangeException(nameof(containsField));
         }
 
         return [field];
@@ -362,7 +356,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse> 
                 break;
 
             default:
-                throw new ArgumentOutOfRangeException("searchType");
+                throw new ArgumentOutOfRangeException(nameof(searchType));
         }
     }
 
@@ -701,7 +695,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse> 
     /// <summary>
     /// Gets the request context.
     /// </summary>
-    public IRequestContext Context { get; private set; }
+    public IRequestContext Context { get; private set; } = context ?? throw new ArgumentNullException(nameof(context));
 
     /// <summary>
     /// Gets the localizer from the request context.
@@ -752,7 +746,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse> 
     /// A state bag for behaviors to preserve state among their methods.
     /// It will be cleared before each request, e.g. Process call.
     /// </summary>
-    public IDictionary<string, object> StateBag { get; private set; }
+    public IDictionary<string, object> StateBag { get; private set; } = new Dictionary<string, object>();
 
     IRow IListRequestHandler.Row => Row;
     ListRequest IListRequestHandler.Request => Request;

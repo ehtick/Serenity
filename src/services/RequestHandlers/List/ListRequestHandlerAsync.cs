@@ -26,8 +26,8 @@ public class ListRequestHandlerAsync<TRow, TListRequest, TListResponse> :
     public ListRequestHandlerAsync(IRequestContext context) : base(context)
     {
         behaviors = new Lazy<IListBehaviorAsync[]>(() =>
-            BehaviorProviderExtensions.AutoWrapBehaviors<IListBehavior, IListBehaviorSync, IListBehaviorAsync>(
-                GetBehaviors(), behavior => new SyncToAsyncListBehaviorWrapper(behavior)).ToArray());
+            [.. BehaviorProviderExtensions.AutoWrapBehaviors<IListBehavior, IListBehaviorSync, IListBehaviorAsync>(
+                GetBehaviors(), behavior => new SyncToAsyncListBehaviorWrapper(behavior))]);
     }
 
     /// <inheritdoc/>
@@ -35,7 +35,7 @@ public class ListRequestHandlerAsync<TRow, TListRequest, TListResponse> :
     {
         foreach (var behavior in behaviors.Value)
         {
-            if (behavior is IListMapFieldExpressionBehavior mapper &&
+            if (((behavior as IWrappedBehavior)?.WrappedBehavior ?? behavior) is IListMapFieldExpressionBehavior mapper &&
                 mapper.MapFieldExpression(this, query, field) is string expression)
                 return expression;
         }
@@ -156,7 +156,7 @@ public class ListRequestHandlerAsync<TRow, TListRequest, TListResponse> :
         StateBag.Clear();
         lookupAccessMode = false;
         ignoredEqualityFilters = null;
-        Connection = connection ?? throw new ArgumentNullException("connection");
+        Connection = connection ?? throw new ArgumentNullException(nameof(connection));
         Request = request ?? throw new ArgumentNullException(nameof(request));
         await ValidateRequestAsync(cancellationToken).ConfigureAwait(false);
 

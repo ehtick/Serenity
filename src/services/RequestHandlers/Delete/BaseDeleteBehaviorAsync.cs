@@ -3,7 +3,7 @@ namespace Serenity.Services;
 /// <summary>
 /// Base class for types implementing <see cref="IDeleteBehaviorAsync"/>
 /// </summary>
-public abstract class BaseDeleteBehaviorAsync : IDeleteBehaviorAsync
+public abstract class BaseDeleteBehaviorAsync : IDeleteBehaviorAsync, IDeleteExceptionBehavior
 {
     /// <inheritdoc/>
     public virtual Task OnPrepareQueryAsync(IDeleteRequestHandler handler, SqlQuery query,
@@ -45,5 +45,10 @@ public abstract class BaseDeleteBehaviorAsync : IDeleteBehaviorAsync
         CancellationToken cancellationToken = default)
     {
         return Task.CompletedTask;
+    }
+
+    /// <inheritdoc/>
+    public virtual void OnException(IDeleteRequestHandler handler, Exception exception)
+    {
     }
 }

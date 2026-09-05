@@ -28,8 +28,8 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> :
     public ListRequestHandler(IRequestContext context) : base(context)
     {
         behaviors = new Lazy<IListBehaviorSync[]>(() =>
-            BehaviorProviderExtensions.AutoWrapBehaviors<IListBehavior, IListBehaviorAsync, IListBehaviorSync>(
-                GetBehaviors(), behavior => new AsyncToSyncListBehaviorWrapper(behavior)).ToArray());
+            [.. BehaviorProviderExtensions.AutoWrapBehaviors<IListBehavior, IListBehaviorAsync, IListBehaviorSync>(
+                GetBehaviors(), behavior => new AsyncToSyncListBehaviorWrapper(behavior))]);
     }
 
     /// <inheritdoc/>
@@ -37,7 +37,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> :
     {
         foreach (var behavior in behaviors.Value)
         {
-            if (behavior is IListMapFieldExpressionBehavior mapper &&
+            if (((behavior as IWrappedBehavior)?.WrappedBehavior ?? behavior) is IListMapFieldExpressionBehavior mapper &&
                 mapper.MapFieldExpression(this, query, field) is string expression)
                 return expression;
         }
@@ -154,7 +154,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> :
         StateBag.Clear();
         lookupAccessMode = false;
         ignoredEqualityFilters = null;
-        Connection = connection ?? throw new ArgumentNullException("connection");
+        Connection = connection ?? throw new ArgumentNullException(nameof(connection));
         Request = request ?? throw new ArgumentNullException(nameof(request));
         ValidateRequest();
 
