@@ -553,7 +553,7 @@ public static class SqlHelper
     {
         string commandText = query.ToString();
         if (connection is ISqlOperationInterceptor interceptor &&
-            interceptor.ExecuteNonQuery(commandText, query.Params, ExpectedRows.One, query, true) is { HasValue: true })
+            interceptor.ExecuteNonQuery(commandText, query.Params, ExpectedRows.One, query, getNewId: false) is { HasValue: true })
             return;
 
         using var command = NewCommand(connection, commandText, query.Params);
@@ -572,7 +572,7 @@ public static class SqlHelper
     {
         string commandText = query.ToString();
         if (connection is ISqlOperationInterceptor interceptor &&
-            await interceptor.ExecuteNonQueryAsync(commandText, query.Params, ExpectedRows.One, query, true, cancellationToken).ConfigureAwait(false) is { HasValue: true })
+            await interceptor.ExecuteNonQueryAsync(commandText, query.Params, ExpectedRows.One, query, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true })
             return;
 
         using var command = NewCommand(connection, commandText, query.Params);
@@ -676,7 +676,7 @@ public static class SqlHelper
     {
         string commandText = query.ToString();
         if (connection is ISqlOperationInterceptor interceptor &&
-            interceptor.ExecuteNonQuery(commandText, query.Params, ExpectedRows.One, query, true) is { HasValue: true } intres)
+            interceptor.ExecuteNonQuery(commandText, query.Params, ExpectedRows.One, query, getNewId: false) is { HasValue: true } intres)
             return (int)intres.Value;
 
         using var command = NewCommand(connection, commandText, query.Params);
@@ -696,7 +696,7 @@ public static class SqlHelper
     {
         string commandText = query.ToString();
         if (connection is ISqlOperationInterceptor interceptor &&
-            await interceptor.ExecuteNonQueryAsync(commandText, query.Params, ExpectedRows.One, query, true, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.ExecuteNonQueryAsync(commandText, query.Params, ExpectedRows.One, query, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return (int)intres.Value;
 
         using var command = NewCommand(connection, commandText, query.Params);
